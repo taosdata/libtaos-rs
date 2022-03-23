@@ -63,36 +63,57 @@ impl Display for TaosError {
     }
 }
 
-#[derive(Builder, Debug)]
-#[builder(setter(into))]
+#[derive(Builder, Default, Debug)]
+#[builder(setter(strip_option, into), default)]
 pub struct TaosCfg {
-    ip: String,
-    user: String,
-    pass: String,
-    #[builder(setter(strip_option))]
+    #[builder(setter(strip_option, into))]
+    ip: Option<String>,
+    #[builder(setter(strip_option, into))]
+    user: Option<String>,
+    #[builder(setter(strip_option, into))]
+    pass: Option<String>,
+    #[builder(setter(strip_option, into))]
     db: Option<String>,
-    port: u16,
+    #[builder(setter(strip_option, into))]
+    port: Option<u16>,
 }
 
 impl TaosCfg {
     #[cfg(feature = "rest")]
     pub fn connect(&self) -> Result<Taos, Error> {
-        Ok(Taos::new(
-            format!("http://{}:{}/rest/sql", self.ip, self.port + 11),
-            self.user.clone(),
-            self.pass.clone(),
-        ))
+        let user = self.user.as_deref().unwrap_or("root").to_string();
+        let pass = self.pass.as_deref().unwrap_or("taosdata").to_string();
+        match self.db.as_ref() {
+            Some(db) => Ok(Taos::new(
+                format!(
+                    "http://{}:{}/rest/sql/{}",
+                    self.ip.as_deref().unwrap_or("localhost"),
+                    self.port.unwrap_or(6041),
+                    db
+                ),
+                user,
+                pass,
+            )),
+            None => Ok(Taos::new(
+                format!(
+                    "http://{}:{}/rest/sql",
+                    self.ip.as_deref().unwrap_or("localhost"),
+                    self.port.unwrap_or(6041)
+                ),
+                user,
+                pass,
+            )),
+        }
     }
 
     #[cfg(not(feature = "rest"))]
     pub fn connect(&self) -> Result<Taos, Error> {
-        let default_db = "log".to_string();
         Taos::new(
             &self.ip,
             &self.user,
             &self.pass,
-            self.db.as_ref().unwrap_or(&default_db),
-            self.port,
+            &self.db,
+            self.port.unwrap_or(0),
         )
     }
 }

@@ -21,17 +21,17 @@ unsafe impl Send for Taos {}
 unsafe impl Sync for Taos {}
 
 impl Taos {
-    pub fn new(
-        ip: impl ToCString,
-        user: impl ToCString,
-        pass: impl ToCString,
-        db: impl ToCString,
+    pub fn new<'a>(
+        ip: impl Into<NullableCStr<'a>>,
+        user: impl Into<NullableCStr<'a>>,
+        pass: impl Into<NullableCStr<'a>>,
+        db: impl Into<NullableCStr<'a>>,
         port: u16,
     ) -> Result<Self, Error> {
-        let ip = ip.to_c_string();
-        let user = user.to_c_string();
-        let pass = pass.to_c_string();
-        let db = db.to_c_string();
+        let ip = ip.into().as_ptr();
+        let user = user.into().as_ptr();
+        let pass = pass.into().as_ptr();
+        let db = db.into().as_ptr();
 
         #[cfg(feature = "cleanup")]
         // Call taos_init at first connection.
@@ -49,14 +49,7 @@ impl Taos {
         //     );
         // }
         unsafe {
-            let conn = taos_connect(
-                ip.as_ptr(),
-                user.as_ptr(),
-                pass.as_ptr(),
-                db.as_ptr(),
-                port as u16,
-            )
-            .as_mut();
+            let conn = taos_connect(ip, user, pass, db, port).as_mut();
             match conn {
                 None => Err(Error::ConnectionInvalid),
                 Some(conn) => Ok(Taos { conn: conn as _ }),
@@ -203,9 +196,7 @@ impl CTaosResult {
     }
 
     pub fn affected_rows(&self) -> i32 {
-        unsafe {
-            taos_affected_rows(self.res)
-        }
+        unsafe { taos_affected_rows(self.res) }
     }
 
     pub fn fetch_fields(&self) -> TaosQueryData {

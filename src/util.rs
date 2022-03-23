@@ -84,3 +84,6 @@ impl ToCString for BString {
         self.to_string().to_c_string()
     }
 }
+
+mod into_c_str;
+pub use into_c_str::*;

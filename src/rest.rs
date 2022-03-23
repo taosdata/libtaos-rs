@@ -116,10 +116,13 @@ fn value_to_field(from: &TaosQueryResponse, value: Value, meta: &ColumnMeta) -> 
         ),
         TaosDataType::Binary => match value {
             Value::String(str) => Field::Binary(str.into()),
-            v => unreachable!("{}", &format!(
-                "the column declared as binary but not: {:?}, from {:?}",
-                v, from
-            )),
+            v => unreachable!(
+                "{}",
+                &format!(
+                    "the column declared as binary but not: {:?}, from {:?}",
+                    v, from
+                )
+            ),
         },
         TaosDataType::NChar => match value {
             Value::String(str) => Field::NChar(str),

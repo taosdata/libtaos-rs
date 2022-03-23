@@ -56,7 +56,7 @@ impl Stmt {
                     let res = taos_query(self.taos, b"select server_version()\0" as *const u8 as _);
                     let errno = taos_errno(res);
                     if errno == 0 {
-                        return Ok(())
+                        return Ok(());
                     } else {
                         Err(TaosError { code, err })
                     }
@@ -88,13 +88,8 @@ impl Stmt {
             let res = taos_stmt_bind_param(self.stmt, params.as_ptr() as _);
             self.err_or(res)?;
             let res = taos_stmt_add_batch(self.stmt);
-            let res = self.err_or(res);
-
-            if let Err(TaosError { code, err }) = res {
-                return self.bind_inplace(params)
-            }
+            self.err_or(res)
         }
-        Ok(())
     }
 
     pub fn bind_batch_at_col<T>(&mut self, _params: T) -> Result<(), TaosError>
@@ -166,7 +161,10 @@ impl Taos {
         unsafe {
             let stmt = taos_stmt_init(self.as_raw());
             // let res = taos_stmt_prepare(stmt, sql.as_ptr(), 0);
-            let mut stmt = Stmt { taos: self.as_raw(), stmt };
+            let mut stmt = Stmt {
+                taos: self.as_raw(),
+                stmt,
+            };
             stmt.prepare(sql)?;
             Ok(stmt)
         }
@@ -512,7 +510,10 @@ mod test {
         taos.exec(format!("drop database if exists {db}")).await?;
         taos.exec(format!("create database {db}")).await?;
         taos.exec(format!("use {db}")).await?;
-        taos.exec(format!("create stable STB(ts timestamp, n int) tags(b int)")).await?;
+        taos.exec(format!(
+            "create stable STB(ts timestamp, n int) tags(b int)"
+        ))
+        .await?;
         let mut stmt = taos.stmt("insert into ? using STB tags(?) values(?, ?)")?;
 
         stmt.set_tbname_tags("tb0", [0i32])?;
