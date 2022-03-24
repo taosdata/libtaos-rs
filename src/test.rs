@@ -28,3 +28,8 @@ fn test_builder() {
         .connect()
         .expect("connect with default");
 }
+
+#[test]
+fn test_builder2() {
+    let _ = taos().unwrap();
+}

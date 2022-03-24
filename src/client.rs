@@ -28,11 +28,7 @@ impl Taos {
         db: impl Into<NullableCStr<'a>>,
         port: u16,
     ) -> Result<Self, Error> {
-        let ip = ip.into().as_ptr();
-        let user = user.into().as_ptr();
-        let pass = pass.into().as_ptr();
-        let db = db.into().as_ptr();
-
+        let (ip, user, pass, db) = (ip.into(), user.into(), pass.into(), db.into());
         #[cfg(feature = "cleanup")]
         // Call taos_init at first connection.
         {
@@ -42,14 +38,15 @@ impl Taos {
             }
             *n += 1;
         }
-        // unsafe {
-        //     taos_options(
-        //         TSDB_OPTION_TSDB_OPTION_CHARSET,
-        //         "UTF-8".to_c_string().as_ptr() as _,
-        //     );
-        // }
         unsafe {
-            let conn = taos_connect(ip, user, pass, db, port).as_mut();
+            taos_options(
+                TSDB_OPTION_TSDB_OPTION_CHARSET,
+                "UTF-8".to_c_string().as_ptr() as _,
+            );
+        }
+        unsafe {
+            let conn =
+                taos_connect(ip.as_ptr(), user.as_ptr(), pass.as_ptr(), db.as_ptr(), port).as_mut();
             match conn {
                 None => Err(Error::ConnectionInvalid),
                 Some(conn) => Ok(Taos { conn: conn as _ }),
