@@ -16,9 +16,9 @@ fn taos_connect() -> Result<Taos, Error> {
         .ip(&var_or_default("TEST_TAOS_IP", "127.0.0.1"))
         .user(&var_or_default("TEST_TAOS_USER", "root"))
         .pass(&var_or_default("TEST_TAOS_PASS", "taosdata"))
-        .db(&var_or_default("TEST_TAOS_DB", "log"))
+        // .db(&var_or_default("TEST_TAOS_DB", "log"))
         .port(
-            var_or_default("TEST_TAOS_PORT", "6041")
+            var_or_default("TEST_TAOS_PORT", "6141")
                 .parse::<u16>()
                 .unwrap(),
         )
@@ -37,25 +37,24 @@ async fn main() -> Result<(), Error> {
         true
     );
     assert_eq!(taos.query("create database demo").await.is_ok(), true);
-    assert_eq!(taos.query("use demo").await.is_ok(), true);
     assert_eq!(
-        taos.query("create table m1 (ts timestamp, speed int unsigned)")
+        taos.query("create table demo.m1 (ts timestamp, speed int unsigned)")
             .await
             .is_ok(),
         true
     );
 
-    taos.query(format!("insert into m1 values (now-1s, NULL)").as_str())
+    taos.query(format!("insert into demo.m1 values (now-1s, NULL)").as_str())
         .await?;
     for i in 0..10i32 {
         assert_eq!(
-            taos.query(format!("insert into m1 values (now+{}s, {})", i, i).as_str())
+            taos.query(format!("insert into demo.m1 values (now+{}s, {})", i, i).as_str())
                 .await
                 .is_ok(),
             true
         );
     }
-    let rows = taos.query("select * from m1").await?;
+    let rows = taos.query("select * from demo.m1").await?;
 
     println!(
         "{}",
