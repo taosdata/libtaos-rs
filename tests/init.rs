@@ -22,6 +22,6 @@ pub fn taos() -> Result<Taos, Error> {
                 .unwrap(),
         )
         .build()
-        .expect("ToasCfg builder error")
+        .expect("TaosCfg builder error")
         .connect()
 }
