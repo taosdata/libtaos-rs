@@ -1,6 +1,7 @@
 use std::{
     borrow::Cow,
     fmt::{self, Display},
+    sync::Once,
 };
 
 use derive_builder::Builder;
@@ -63,7 +64,7 @@ impl Display for TaosError {
     }
 }
 
-#[derive(Builder, Default, Debug)]
+#[derive(Builder, Debug)]
 #[builder(setter(strip_option, into), default)]
 pub struct TaosCfg {
     #[builder(setter(strip_option, into))]
@@ -76,33 +77,64 @@ pub struct TaosCfg {
     db: Option<String>,
     #[builder(setter(strip_option, into))]
     port: Option<u16>,
+    #[builder(setter(skip))]
+    ping_once: Once,
+}
+
+impl Default for TaosCfg {
+    fn default() -> Self {
+        Self {
+            ip: Default::default(),
+            user: Default::default(),
+            pass: Default::default(),
+            db: Default::default(),
+            port: Default::default(),
+            ping_once: Once::new(),
+        }
+    }
 }
 
 impl TaosCfg {
     #[cfg(feature = "rest")]
     pub fn connect(&self) -> Result<Taos, Error> {
+        use std::{future, sync::Once};
         let user = self.user.as_deref().unwrap_or("root").to_string();
         let pass = self.pass.as_deref().unwrap_or("taosdata").to_string();
-        match self.db.as_ref() {
-            Some(db) => Ok(Taos::new(
+        let port = self
+            .port
+            .map(|p| if p == 6030 { 6041 } else { p })
+            .unwrap_or(6041);
+        let taos = match self.db.as_ref() {
+            Some(db) => Taos::new(
                 format!(
                     "http://{}:{}/rest/sql/{}",
                     self.ip.as_deref().unwrap_or("localhost"),
-                    self.port.unwrap_or(6041),
+                    port,
                     db
                 ),
                 user,
                 pass,
-            )),
-            None => Ok(Taos::new(
+            ),
+            None => Taos::new(
                 format!(
                     "http://{}:{}/rest/sql",
                     self.ip.as_deref().unwrap_or("localhost"),
-                    self.port.unwrap_or(6041)
+                    port,
                 ),
                 user,
                 pass,
-            )),
+            ),
+        };
+        let mut res = None;
+        self.ping_once.call_once(|| {
+            if let Err(err) = futures::executor::block_on(taos.exec("select server_version()")) {
+                res = Some(err)
+            }
+        });
+        if let Some(err) = res {
+            Err(err)
+        } else {
+            Ok(taos)
         }
     }
 
