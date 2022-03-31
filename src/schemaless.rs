@@ -53,7 +53,7 @@ impl Taos {
     ///
     ///     ```ignore,rust
     ///     let lines = ["sys.if.bytes.out 1479496100 1.3E3 host=web01 interface=eth0"];
-    ///     taos.schemaless_insert(&lines, TSDB_SML_LINE_PROTOCOL, TSDB_SML_TIMESTAMP_SECONDS)?;
+    ///     taos.schemaless_insert(&lines, TSDB_SML_TELNET_PROTOCOL, TSDB_SML_TIMESTAMP_NOT_CONFIGURED)?;
     ///     ```
     ///
     /// - or OpenTSDB json protocol.
@@ -71,7 +71,7 @@ impl Taos {
     ///                 "t4":   "123_abc_.!@#$%^&*:;,./?|+-=()[]{}<>"
     ///             }
     ///         }"#];
-    ///     taos.schemaless_insert(&lines, TSDB_SML_LINE_PROTOCOL, TSDB_SML_TIMESTAMP_SECONDS)?;
+    ///     taos.schemaless_insert(&lines, TSDB_SML_JSON_PROTOCOL, TSDB_SML_TIMESTAMP_NOT_CONFIGURED)?;
     ///     ```
     ///
     pub fn schemaless_insert(
