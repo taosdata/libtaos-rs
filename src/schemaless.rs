@@ -46,7 +46,7 @@ impl Taos {
     ///
     ///     ```ignore,rust
     ///     let lines = ["st,t1=abc,t2=def,t3=anything c1=3i64,c3=L\"pass\",c2=false,c4=4f64 1626006833639000000"];
-    ///     taos.schemaless_insert(&lines, TSDB_SML_TELNET_PROTOCOL, TSDB_SML_TIMESTAMP_NANOSECONDS)?;
+    ///     taos.schemaless_insert(&lines, TSDB_SML_LINE_PROTOCOL, TSDB_SML_TIMESTAMP_NANOSECONDS)?;
     ///     ```
     ///
     /// - OpenTSDB telnet protocol
