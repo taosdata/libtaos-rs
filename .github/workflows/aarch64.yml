@@ -1,0 +1,55 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build_job:
+    # The host should always be linux
+    runs-on: ubuntu-18.04
+    name: Build on ${{ matrix.distro }} ${{ matrix.arch }}
+
+
+    services:
+      # Label used to access the service container
+      redis:
+        # Docker Hub image
+        image: tdengine/tdengine:2.4.0.16
+        env:
+          TAOS_FQDN: localhost
+        ports:
+        - 6030-6050
+        - 6030-6050/udp
+    steps:
+      - uses: actions/checkout@v2.1.0
+      - name: Cache multiple paths
+        uses: actions/cache@v3
+        with:
+          path: |
+            ./rustup
+            ./.cargo
+          key: "cargo-aarch64"
+      - uses: uraimo/run-on-arch-action@v2
+        name: Run commands
+        id: runcmd
+        with:
+          arch: aarch64
+          distro: ubuntu18.04
+          dockerRunArgs: --privileged
+          # Not required, but speeds up builds by storing container images in
+          # a GitHub package registry.
+          githubToken: ${{ github.token }}
+
+          # Set an output parameter `uname` for use in subsequent steps
+          run: |
+            uname -a
+            ./.ci/test.sh
+            echo ::set-output name=uname::$(uname -a)
+      - name: Build tools
+        run: |
+          uname -a
