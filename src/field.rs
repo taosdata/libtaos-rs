@@ -348,7 +348,7 @@ mod test {
     use crate::test::taos;
     use crate::*;
 
-    #[tokio::test]
+    #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     #[proc_test_catalog::test_catalogue]
     /// Test describe sql
     async fn test_describe() -> Result<(), Error> {

@@ -2,13 +2,14 @@ use std::str::FromStr;
 use std::time::Duration;
 
 use itertools::Itertools;
+#[cfg(not(feature = "rest"))]
 use log::*;
 use serde::Deserialize;
 use serde_json::Value;
 
 use crate::field::*;
 use crate::*;
-use crate::{error::TaosCode, Error, TaosError};
+use crate::{Error, TaosError};
 #[derive(Debug, Clone)]
 pub struct Taos {
     client: reqwest::Client,
@@ -17,21 +18,21 @@ pub struct Taos {
     password: String,
 }
 
-#[derive(Debug, Deserialize)]
-struct TaosQueryDataProxy {
-    status: String,
-    head: Vec<String>,
-    column_meta: Vec<ColumnMeta>,
-    data: Vec<Vec<serde_json::Value>>,
-    rows: usize,
-}
+// #[derive(Debug, Deserialize)]
+// struct TaosQueryDataProxy {
+//     status: String,
+//     head: Vec<String>,
+//     column_meta: Vec<ColumnMeta>,
+//     data: Vec<Vec<serde_json::Value>>,
+//     rows: usize,
+// }
 
-#[derive(Debug, Deserialize)]
-struct TaosQueryError {
-    status: String,
-    code: TaosCode,
-    desc: String,
-}
+// #[derive(Debug, Deserialize)]
+// struct TaosQueryError {
+//     status: String,
+//     code: TaosCode,
+//     desc: String,
+// }
 
 #[derive(Debug, Clone, Deserialize)]
 #[serde(untagged)]
@@ -141,6 +142,7 @@ impl From<TaosQueryResponse> for Result<TaosQueryData, Error> {
     fn from(from: TaosQueryResponse) -> Result<TaosQueryData, Error> {
         let from_back = from.clone();
         match from {
+            #[allow(unused_variables)]
             TaosQueryResponse::Data {
                 status,
                 head,
@@ -159,6 +161,7 @@ impl From<TaosQueryResponse> for Result<TaosQueryData, Error> {
                     .collect_vec();
                 Ok(TaosQueryData { column_meta, rows })
             }
+            #[allow(unused_variables)]
             TaosQueryResponse::Error { status, code, desc } => {
                 Err(Error::RawTaosError(TaosError {
                     code: code.into(),
@@ -245,7 +248,7 @@ impl Taos {
         let res: TaosQueryResponse = res.json().await?;
         match res {
             TaosQueryResponse::Data { .. } => Ok(()),
-            TaosQueryResponse::Error { status, code, desc } => {
+            TaosQueryResponse::Error { code, desc, .. } => {
                 Err(Error::RawTaosError(TaosError {
                     code: code.into(),
                     err: desc.into(),

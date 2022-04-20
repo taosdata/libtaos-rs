@@ -38,12 +38,12 @@ bindgen = { version = "0.59.2", optional = true }
 
 [dev-dependencies]
 env_logger = "0.8.3"
-tokio = {version = "1.15.0", features = ["rt", "macros", "rt-multi-thread"]}
+tokio = {version = "1.15.0", features = ["full"]}
 proc-test-catalog = { path = "./proc-test-catalog", version = "0.1.0" }
 test-catalog = { path = "./test-catalog", version = "0.1.0" }
 
 [features]
-default = ["stmt", "schemaless"]
+default = ["r2d2", "rest"]
 rest = ["reqwest"]
 stmt = []
 cleanup = []

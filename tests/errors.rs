@@ -3,7 +3,7 @@ mod init;
 use crate::TaosCode;
 use libtaos::*;
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn invalid_database_name() -> () {
     let taos = init::taos().unwrap();
     let res = taos
@@ -23,7 +23,7 @@ async fn invalid_database_name() -> () {
     }
 }
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn invalid_table_name() -> () {
     let taos = init::taos().unwrap();
     let res = taos
