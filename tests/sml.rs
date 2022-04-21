@@ -1,10 +1,11 @@
 mod init;
-use libtaos::schemaless::*;
-use libtaos::*;
 
+#[cfg(all(not(feature = "rest"), feature = "schemaless"))]
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
-async fn sml() -> Result<(), Error> {
+async fn sml() -> Result<(), libtaos::Error> {
     init::init();
+    use libtaos::schemaless::*;
+
     let taos = init::taos().unwrap();
 
     let db = "rs_test_line";
