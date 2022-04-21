@@ -33,6 +33,7 @@ jobs:
           path: |
             ./rustup
             ./.cargo
+            ./target
           key: "cargo-aarch64"
       - uses: uraimo/run-on-arch-action@v2
         name: Run commands
