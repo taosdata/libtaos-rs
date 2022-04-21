@@ -18,7 +18,7 @@ if [ -e .cargo/env ]; then
   echo use local .cargo
 else
   export HOME=`pwd`
-  bash rustup-init --profile default -y -v
+  bash rustup-init --profile minimal --default-toolchain nightly -y -v
   source $HOME/.cargo/env
 fi
 
