@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 apt-get update
-apt-get install -y wget curl build-essential openssl
+apt-get install -y wget curl build-essential openssl libssl-dev
 
 # install server
 wget https://www.taosdata.com/assets-download/TDengine-server-2.4.0.16-Linux-aarch64.tar.gz \
