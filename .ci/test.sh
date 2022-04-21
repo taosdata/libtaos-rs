@@ -22,5 +22,6 @@ else
   source $HOME/.cargo/env
 fi
 
-cargo test
-cargo test --features rest,r2d2
+cargo install cargo-nextest
+cargo nextest run
+cargo nextest run --features rest,r2d2
