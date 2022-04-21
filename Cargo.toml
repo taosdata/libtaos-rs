@@ -8,7 +8,7 @@ members = [
 authors = ["Linhe Huo <linhehuo@gmail.com>"]
 edition = "2018"
 name = "libtaos"
-version = "0.4.4-alpha.0"
+version = "0.4.4-alpha.1"
 keywords = ["TDengine", "taos", "r2d2", "database", "tsdb"]
 license = "MIT"
 repository = "https://github.com/taosdata/libtaos-rs.git"
@@ -43,7 +43,7 @@ proc-test-catalog = { path = "./proc-test-catalog", version = "0.1.0" }
 test-catalog = { path = "./test-catalog", version = "0.1.0" }
 
 [features]
-default = ["r2d2", "rest"]
+default = ["stmt", "schemaless"]
 rest = ["reqwest"]
 stmt = []
 cleanup = []
