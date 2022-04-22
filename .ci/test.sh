@@ -25,4 +25,3 @@ fi
 
 cargo install cargo-nextest
 cargo nextest run
-cargo nextest run --features rest,r2d2
