@@ -10,6 +10,7 @@ wget https://www.taosdata.com/assets-download/TDengine-server-2.4.0.16-Linux-aar
   && ./install.sh -e no \
   && cd ../
 
+nohup taosadapter &
 nohup taosd &
 
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > rustup-init
