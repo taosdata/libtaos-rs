@@ -27,6 +27,35 @@ fn taos_connect() -> Result<Taos, Error> {
         .connect()
 }
 
+#[tokio::test]
+async fn cc() -> Result<(), Error> {
+    let cfg: TaosCfg = TaosCfgBuilder::default()
+        .ip("127.0.0.1")
+        .user("root")
+        .pass("taosdata")
+        .db("log") // do not set if not require a default database.
+        .port(6030u16)
+        .build()
+        .expect("TaosCfg builder error");
+    let pool = r2d2::Pool::builder()
+        .max_size(10000) // 最大连接数
+        .build(cfg)
+        .unwrap();
+    let conn = pool.get().unwrap();
+    // let conn = cfg.connect().unwrap();
+    conn.exec("create database if not exists demo").await?;
+    conn.exec("use demo").await?;
+    conn.exec("create table if not exists tb1 (ts timestamp, v int)")
+        .await?;
+    conn.exec("insert into tb1 values(now, 1)").await?;
+
+    let rows = conn.query("select * from tb1").await?;
+    for row in rows.rows {
+        println!("{}", row.into_iter().join(","));
+    }
+    Ok(())
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     init();

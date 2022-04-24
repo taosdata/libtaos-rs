@@ -5,6 +5,7 @@ use std::{
 };
 
 use derive_builder::Builder;
+#[cfg(not(feature = "rest"))]
 use itertools::Itertools;
 use log::*;
 use thiserror::Error;
@@ -97,7 +98,6 @@ impl Default for TaosCfg {
 impl TaosCfg {
     #[cfg(feature = "rest")]
     pub fn connect(&self) -> Result<Taos, Error> {
-        use std::{future, sync::Once};
         let user = self.user.as_deref().unwrap_or("root").to_string();
         let pass = self.pass.as_deref().unwrap_or("taosdata").to_string();
         let port = self
@@ -162,7 +162,7 @@ impl r2d2::ManageConnection for TaosCfg {
         self.connect()
     }
 
-    fn is_valid(&self, conn: &mut Self::Connection) -> Result<(), Self::Error> {
+    fn is_valid(&self, _conn: &mut Self::Connection) -> Result<(), Self::Error> {
         Ok(())
     }
 

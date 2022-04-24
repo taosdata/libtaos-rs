@@ -2,7 +2,7 @@ mod init;
 
 use libtaos::*;
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn describe_non_exist_table() -> () {
     init::init();
     let taos = init::taos().unwrap();
@@ -23,7 +23,7 @@ async fn describe_non_exist_table() -> () {
     }
 }
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn describe() -> () {
     let taos = init::taos().unwrap();
     let res = taos.describe("log.log").await;
@@ -32,7 +32,7 @@ async fn describe() -> () {
     let _ = dbg!(res.names());
 }
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn query() -> Result<(), Error> {
     let taos = init::taos()?;
     let _res = taos.query("select * from log.log limit 10").await?;

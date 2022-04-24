@@ -81,15 +81,12 @@ impl Taos {
         precision: TSDB_SML_TIMESTAMP_TYPE,
     ) -> Result<i32, TaosError> {
         let lines: Vec<_> = lines.iter().map(|line| line.to_c_string()).collect();
-        let mut lines = lines
-            .iter()
-            .map(|line| line.as_ptr() as *mut i8)
-            .collect_vec();
+        let mut lines = lines.iter().map(|line| line.as_ptr()).collect_vec();
         let lines = lines.as_mut_slice();
         unsafe {
             let res = taos_schemaless_insert(
                 self.as_raw(),
-                lines.as_mut_ptr() as *mut *mut i8,
+                lines.as_mut_ptr() as *mut *mut _,
                 lines.len() as _,
                 protocol as _,
                 precision as _,

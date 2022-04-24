@@ -2,7 +2,7 @@ mod init;
 
 use libtaos::*;
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn double_quote() -> Result<(), Error> {
     init::init();
     let taos = init::taos().unwrap();
@@ -21,5 +21,26 @@ async fn double_quote() -> Result<(), Error> {
     let _ = taos.exec("insert into tb1 values(now, 1.0)").await;
     let res = taos.query("select * from stb1").await?;
     dbg!(&res);
+    Ok(())
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+async fn query() -> Result<(), Error> {
+    init::init();
+    let taos = init::taos().unwrap();
+    let q = taos.query("select * from log.logs limit 10").await?;
+
+    let cols = &q.column_meta;
+    for col in cols {
+        println!(
+            "name: {}, type: {:?}, bytes: {}",
+            col.name, col.type_, col.bytes
+        );
+    }
+    for (i, row) in q.rows.iter().enumerate() {
+        for (j, cell) in row.iter().enumerate() {
+            println!("cell({}, {}) data: {}", i, j, cell);
+        }
+    }
     Ok(())
 }

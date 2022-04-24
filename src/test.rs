@@ -20,8 +20,8 @@ pub fn taos() -> Result<Taos, Error> {
         .connect()
 }
 
-#[test]
-fn test_builder() {
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+async fn test_builder() {
     let _ = TaosCfgBuilder::default()
         .build()
         .expect("cfg builder error")
@@ -29,7 +29,7 @@ fn test_builder() {
         .expect("connect with default");
 }
 
-#[test]
-fn test_builder2() {
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+async fn test_builder2() {
     let _ = taos().unwrap();
 }
