@@ -66,7 +66,7 @@ impl Display for TaosError {
 }
 
 #[derive(Builder, Debug)]
-#[builder(setter(strip_option, into), default)]
+#[builder(default)]
 pub struct TaosCfg {
     #[builder(setter(strip_option, into))]
     ip: Option<String>,
@@ -78,7 +78,7 @@ pub struct TaosCfg {
     db: Option<String>,
     #[builder(setter(strip_option, into))]
     port: Option<u16>,
-    #[builder(setter(strip_option, into))]
+    #[builder(setter(into))]
     token: Option<String>,
     #[builder(setter(skip))]
     ping_once: Once,

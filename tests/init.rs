@@ -25,6 +25,7 @@ pub fn taos() -> Result<Taos, Error> {
                 .parse::<u16>()
                 .unwrap(),
         )
+        .token(var("TEST_TAOS_TOKEN").ok())
         .build()
         .expect("TaosCfg builder error")
         .connect()
