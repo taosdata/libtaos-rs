@@ -114,6 +114,7 @@ impl TaosCfg {
                 ),
                 user,
                 pass,
+                None,
             ),
             None => Taos::new(
                 format!(
@@ -123,6 +124,7 @@ impl TaosCfg {
                 ),
                 user,
                 pass,
+                None,
             ),
         };
         let mut res = None;
