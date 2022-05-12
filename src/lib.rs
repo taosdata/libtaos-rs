@@ -66,7 +66,7 @@ impl Display for TaosError {
 }
 
 #[derive(Builder, Debug)]
-#[builder(setter(strip_option, into), default)]
+#[builder(default)]
 pub struct TaosCfg {
     #[builder(setter(strip_option, into))]
     ip: Option<String>,
@@ -78,6 +78,8 @@ pub struct TaosCfg {
     db: Option<String>,
     #[builder(setter(strip_option, into))]
     port: Option<u16>,
+    #[builder(setter(into))]
+    token: Option<String>,
     #[builder(setter(skip))]
     ping_once: Once,
 }
@@ -90,6 +92,7 @@ impl Default for TaosCfg {
             pass: Default::default(),
             db: Default::default(),
             port: Default::default(),
+            token: Default::default(),
             ping_once: Once::new(),
         }
     }
@@ -105,25 +108,50 @@ impl TaosCfg {
             .map(|p| if p == 6030 { 6041 } else { p })
             .unwrap_or(6041);
         let taos = match self.db.as_ref() {
-            Some(db) => Taos::new(
-                format!(
-                    "http://{}:{}/rest/sql/{}",
-                    self.ip.as_deref().unwrap_or("localhost"),
-                    port,
-                    db
+            Some(db) => match self.token.as_ref() {
+                Some(token) => Taos::new(
+                    format!(
+                        "http://{}:{}/rest/sql/{}?token={}",
+                        self.ip.as_deref().unwrap_or("localhost"),
+                        port,
+                        db,
+                        token
+                    ),
+                    user,
+                    pass,
                 ),
-                user,
-                pass,
-            ),
-            None => Taos::new(
-                format!(
-                    "http://{}:{}/rest/sql",
-                    self.ip.as_deref().unwrap_or("localhost"),
-                    port,
+                None => Taos::new(
+                    format!(
+                        "http://{}:{}/rest/sql/{}",
+                        self.ip.as_deref().unwrap_or("localhost"),
+                        port,
+                        db
+                    ),
+                    user,
+                    pass,
                 ),
-                user,
-                pass,
-            ),
+            },
+            None => match self.token.as_ref() {
+                Some(token) => Taos::new(
+                    format!(
+                        "http://{}:{}/rest/sql?token={}",
+                        self.ip.as_deref().unwrap_or("localhost"),
+                        port,
+                        token
+                    ),
+                    user,
+                    pass,
+                ),
+                None => Taos::new(
+                    format!(
+                        "http://{}:{}/rest/sql",
+                        self.ip.as_deref().unwrap_or("localhost"),
+                        port,
+                    ),
+                    user,
+                    pass,
+                ),
+            },
         };
         let mut res = None;
         self.ping_once.call_once(|| {

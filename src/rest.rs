@@ -1,15 +1,14 @@
 use std::str::FromStr;
 use std::time::Duration;
 
+use crate::field::*;
+use crate::*;
+use crate::{Error, TaosError};
 use itertools::Itertools;
 #[cfg(not(feature = "rest"))]
 use log::*;
 use serde::Deserialize;
 use serde_json::Value;
-
-use crate::field::*;
-use crate::*;
-use crate::{Error, TaosError};
 #[derive(Debug, Clone)]
 pub struct Taos {
     client: reqwest::Client,
@@ -248,12 +247,10 @@ impl Taos {
         let res: TaosQueryResponse = res.json().await?;
         match res {
             TaosQueryResponse::Data { .. } => Ok(()),
-            TaosQueryResponse::Error { code, desc, .. } => {
-                Err(Error::RawTaosError(TaosError {
-                    code: code.into(),
-                    err: desc.into(),
-                }))
-            }
+            TaosQueryResponse::Error { code, desc, .. } => Err(Error::RawTaosError(TaosError {
+                code: code.into(),
+                err: desc.into(),
+            })),
         }
     }
     pub async fn query(&self, sql: &str) -> Result<TaosQueryData, Error> {
