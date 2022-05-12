@@ -7,7 +7,6 @@ use crate::{Error, TaosError};
 use itertools::Itertools;
 #[cfg(not(feature = "rest"))]
 use log::*;
-use reqwest::Url;
 use serde::Deserialize;
 use serde_json::Value;
 #[derive(Debug, Clone)]
@@ -173,33 +172,15 @@ impl From<TaosQueryResponse> for Result<TaosQueryData, Error> {
 }
 
 impl Taos {
-    pub fn new(
-        endpoint: String,
-        username: String,
-        password: String,
-        token: Option<String>,
-    ) -> Self {
-        if let Some(t) = token {
-            let url = Url::parse_with_params(&endpoint, &[("token", t)]).unwrap();
-            Self {
-                client: reqwest::ClientBuilder::new()
-                    .timeout(Duration::from_secs(10))
-                    .build()
-                    .expect("build client with timeout error"),
-                endpoint: url.to_string(),
-                username,
-                password,
-            }
-        } else {
-            Self {
-                client: reqwest::ClientBuilder::new()
-                    .timeout(Duration::from_secs(10))
-                    .build()
-                    .expect("build client with timeout error"),
-                endpoint,
-                username,
-                password,
-            }
+    pub fn new(endpoint: String, username: String, password: String) -> Self {
+        Self {
+            client: reqwest::ClientBuilder::new()
+                .timeout(Duration::from_secs(10))
+                .build()
+                .expect("build client with timeout error"),
+            endpoint,
+            username,
+            password,
         }
     }
     pub async fn create_table(&self, table: &str, options: Option<&str>) -> Result<(), Error> {
