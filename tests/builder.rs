@@ -16,5 +16,4 @@ async fn builder() {
         .expect("");
     let taos = _pool.get().expect("");
     taos.exec("select server_version()").await.unwrap();
-
 }

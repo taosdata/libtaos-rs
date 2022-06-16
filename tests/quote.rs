@@ -4,7 +4,7 @@ use libtaos::*;
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn double_quote() -> Result<(), Error> {
-    init::init();
+    //init::init();
     let taos = init::taos().unwrap();
     let _ = taos
         .exec("create database if not exists test_rust_double_quote_tag")
@@ -26,7 +26,7 @@ async fn double_quote() -> Result<(), Error> {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn query() -> Result<(), Error> {
-    init::init();
+    //init::init();
     let taos = init::taos().unwrap();
     let q = taos.query("select * from log.logs limit 10").await?;
 
