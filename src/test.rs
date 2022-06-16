@@ -37,7 +37,15 @@ async fn test_builder2() {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn test_connect_from_dsn() -> Result<(), Error> {
-    let cfg = TaosCfg::from_dsn("http://localhost:6041/")?;
+    let cfg = {
+        cfg_if::cfg_if! {
+            if #[cfg(feature = "rest")] {
+                TaosCfg::from_dsn("http://localhost:6041/")?
+            } else {
+                TaosCfg::from_dsn("taos:///")?
+            }
+        }
+    };
     let taos = cfg.connect()?;
     let _ = taos.query("show databases").await?;
     Ok(())

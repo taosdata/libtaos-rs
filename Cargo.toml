@@ -6,7 +6,7 @@ members = [
 
 [package]
 name = "libtaos"
-version = "0.4.4"
+version = "0.4.5-alpha.0"
 authors = ["Linhe Huo <linhehuo@gmail.com>"]
 documentation = "https://docs.rs/libtaos"
 edition = "2018"
