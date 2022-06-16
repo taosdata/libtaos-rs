@@ -1,46 +1,50 @@
 [workspace]
 members = [
   "test-catalog",
-  "proc-test-catalog"
+  "proc-test-catalog",
 ]
 
 [package]
-authors = ["Linhe Huo <linhehuo@gmail.com>"]
-edition = "2018"
 name = "libtaos"
-version = "0.4.4"
+version = "0.4.5-alpha.0"
+authors = ["Linhe Huo <linhehuo@gmail.com>"]
+documentation = "https://docs.rs/libtaos"
+edition = "2018"
+homepage = "https://github.com/taosdata/libtaos-rs"
 keywords = ["TDengine", "taos", "r2d2", "database", "tsdb"]
 license = "MIT"
 repository = "https://github.com/taosdata/libtaos-rs.git"
 description = "TDengine Client for Rust"
-homepage = "https://github.com/taosdata/libtaos-rs"
-documentation = "https://docs.rs/libtaos"
 
 [dependencies]
 bstr = "0.2"
-derive_builder = "0.10.0"
+chrono = "0.4.19"
+cfg-if = "1.0.0"
+derive_builder = "0.11.2"
+futures = "0.3"
 itertools = "0.10.0"
 lazy_static = "1.4"
 log = "0.4.14"
+mdsn = "0.2.1"
 num_enum = "0.5.1"
-r2d2 = {version = "0.8", optional = true}
-reqwest = {version = "0.11.3", features = ["json"], default-features = false, optional = true }
-serde = {version = "1", features = ["derive"]}
+paste = "1"
+r2d2 = { version = "0.8", optional = true }
+reqwest = { version = "0.11.3", features = ["json"], default-features = false, optional = true }
+serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 serde_repr = "0.1"
-thiserror = "1.0"
-chrono = "0.4.19"
-paste = "1"
 stdext = "0.3.0"
-futures = "0.3"
+thiserror = "1.0"
+
 [build-dependencies]
-bindgen = { version = "0.59.2", optional = true }
+bindgen = { version = "0.60.1", optional = true }
 
 [dev-dependencies]
-env_logger = "0.8.3"
-tokio = {version = "1.15.0", features = ["full"]}
+coverage-helper = "0.1"
+env_logger = "0.9.0"
 proc-test-catalog = { path = "./proc-test-catalog", version = "0.1.0" }
 test-catalog = { path = "./test-catalog", version = "0.1.0" }
+tokio = { version = "1.15.0", features = ["full"] }
 
 [features]
 default = ["stmt", "schemaless"]

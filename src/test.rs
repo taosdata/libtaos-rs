@@ -34,3 +34,41 @@ async fn test_builder() {
 async fn test_builder2() {
     let _ = taos().unwrap();
 }
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+async fn test_connect_from_dsn() -> Result<(), Error> {
+    let cfg = {
+        cfg_if::cfg_if! {
+            if #[cfg(feature = "rest")] {
+                TaosCfg::from_dsn("http://localhost:6041/")?
+            } else {
+                TaosCfg::from_dsn("taos:///")?
+            }
+        }
+    };
+    let taos = cfg.connect()?;
+    let _ = taos.query("show databases").await?;
+    Ok(())
+}
+
+#[test]
+fn test_from_dsn() -> Result<(), Error> {
+    let _ = TaosCfg::from_dsn("taos:///")?;
+
+    TaosCfg::from_dsn("taos1:///").unwrap_err();
+    cfg_if::cfg_if! {
+        if #[cfg(feature = "rest")] {
+            TaosCfg::from_dsn("taos+http:///").unwrap();
+            TaosCfg::from_dsn("taos+https:///").unwrap();
+            TaosCfg::from_dsn("http:///").unwrap();
+            TaosCfg::from_dsn("https:///").unwrap();
+        } else {
+            TaosCfg::from_dsn("taos+http:///").unwrap_err();
+            TaosCfg::from_dsn("taos+https:///").unwrap_err();
+            TaosCfg::from_dsn("http:///").unwrap_err();
+            TaosCfg::from_dsn("https:///").unwrap_err();
+        }
+    }
+
+    Ok(())
+}
