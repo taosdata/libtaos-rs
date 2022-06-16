@@ -1,6 +1,8 @@
 # libtaos - yet another TDengine connector for Rust
 
-![Crates.io](https://img.shields.io/crates/v/libtaos) ![Crates.io](https://img.shields.io/crates/d/libtaos)
+| Crates.io Version                                     | Crates.io Downloads                                   | CodeCov                                                                                                                                         |
+| ----------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![Crates.io](https://img.shields.io/crates/v/libtaos) | ![Crates.io](https://img.shields.io/crates/d/libtaos) | [![codecov](https://codecov.io/gh/taosdata/libtaos-rs/branch/main/graph/badge.svg?token=P11UKNLTVO)](https://codecov.io/gh/taosdata/libtaos-rs) |
 
 Thanks [@songtianyi](https://github.com/songtianyi) for [libtdengine](https://github.com/songtianyi/tdengine-rust-bindings) - a rust bindings project for [TDengine].
 
